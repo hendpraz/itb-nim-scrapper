@@ -33,3 +33,8 @@ You can get `Bearer <token>` and `cvid` from your browser's developer tools.
 2. Open the Network tab
 3. Search for any students
 4. Select the request for searching the student.
+
+## Tools Related
+- Scraper for PDDIKTI -> [PDDIKTI-kemdikbud-API](https://github.com/hendpraz/PDDIKTI-kemdikbud-API)
+- ITB NIM Finder Backend -> [nim-finder-backend](https://github.com/hendpraz/nim-finder-backend)
+- ITB NIM Finder Frontend -> [nim-finder-hendpraz](https://github.com/hendpraz/nim-finder-hendpraz)
