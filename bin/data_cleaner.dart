@@ -87,18 +87,22 @@ Map<String, String> readDataFromFile(String path) {
   return nimNameMap;
 }
 
-void writeToJson(Map<String, String> nimNameMap) async {
-  final file = await File('data/new_22_23_mahasiswa.json').create();
+void writeToJson(Map<String, String> nimNameMap, String path) async {
+  final file = await File(path).create();
 
   await file.writeAsString(jsonEncode(nimNameMap), mode: FileMode.writeOnly);
 }
 
-void writeToPython(Map<String, String> nimNameMap) async {
+void writeToPython({
+  required Map<String, String> nimNameMap,
+  required String path,
+  required String functionName,
+}) async {
   print('Writing to python file...');
 
-  final file = await File('data/new_22_23_mahasiswa.py').create();
+  final file = await File(path).create();
 
-  await file.writeAsString("def get_mahasiswa_22_23_tuples():\n",
+  await file.writeAsString("def $functionName():\n",
       mode: FileMode.writeOnlyAppend);
   await file.writeAsString("  return [\n", mode: FileMode.writeOnlyAppend);
 
@@ -119,11 +123,15 @@ void writeToPython(Map<String, String> nimNameMap) async {
 }
 
 void main() async {
-  final nimNameMap23 = readDataFromFile('data/output_jurusan_22_new.txt');
-  final nimNameMap24 = readDataFromFile('data/output_all_23_new.txt');
+  final nimNameMap23 = readDataFromFile('data/batch_2023.txt');
+  final nimNameMap22 = readDataFromFile('data/batch_2022.txt');
 
-  final nimNameMap = {...nimNameMap23, ...nimNameMap24};
+  final nimNameMap = {...nimNameMap22, ...nimNameMap23};
 
-  writeToJson(nimNameMap);
-  writeToPython(nimNameMap);
+  writeToJson(nimNameMap, 'data/batch_22_23.json');
+  writeToPython(
+    nimNameMap: nimNameMap,
+    path: 'data/batch_22_23.py',
+    functionName: "get_mahasiswa_22_23_tuples",
+  );
 }

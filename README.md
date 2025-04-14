@@ -22,6 +22,14 @@ What you will get:
 ### Read txt, Output to .py and .json
 
 1. Clone this repository
-2. Update file paths that you want to read and merge into Map of NIM and Name. Ex: `data/output_jurusan_22_new.txt`
+2. Update file paths that you want to read and merge into Map of NIM and Name. Ex: `data/batch_2022.txt` and `data/batch_2023.txt`
 3. Run the script with `dart bin/data_cleaner.dart`
-4. You will get the .py and .json file inside `data` folder. Ex: `data/output_jurusan_22_new.py` and `data/output_jurusan_22_new.json`
+4. You will get the .py and .json file inside `data` folder. Ex: `data/batch_22_23.py` and `data/batch_22_23.json`
+
+### Tips
+
+You can get `Bearer <token>` and `cvid` from your browser's developer tools.
+1. Open ITB MS Teams Web App
+2. Open the Network tab
+3. Search for any students
+4. Select the request for searching the student.
