@@ -2,12 +2,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-void main() async {
-  final bearerToken = "Bearer <token>";
-
-  final cvid = "<cvid token>";
-
-  final nimCode = {
+Map<String, String> getNimCodeMap() {
+  return {
     '101': 'Matematika',
     '102': 'Fisika',
     '103': 'Astronomi',
@@ -153,8 +149,10 @@ void main() async {
     '950': 'Pengelolaan Sumberdaya Air (PSDA)',
     '957': 'Terapan Perencanaan Kepariwisataan',
   };
+}
 
-  final headers = {
+Map<String, String> getHeaders(String bearerToken) {
+  return {
     'x-ms-session-id': '3fc0fd31-9e5d-4f2b-aa78-bbdbf2fec0c3',
     'clientrequestid': '6ef24d2c-1124-4698-8cd9-d5ab71960065',
     'x-anchormailbox':
@@ -172,35 +170,61 @@ void main() async {
     'Referer': 'https://teams.microsoft.com/',
     'client-session-id': '3fc0fd31-9e5d-4f2b-aa78-bbdbf2fec0c3',
   };
+}
 
-  final params = {
+Map<String, String> getQueryParams() {
+  return {
     'scenario': 'powerbar',
   };
+}
 
-  final angkatan = '21';
-  final splitter = "\n";
+String getRequestBody({
+  required String query,
+  required String cvid,
+  required int size,
+}) {
+  return '{"EntityRequests":[{"Query":{"QueryString":"$query","DisplayQueryString":"$query"},"EntityType":"People","Size":$size,"Fields":["Id","MRI","DisplayName","EmailAddresses","CompanyName","JobTitle","ImAddress","ExternalDirectoryObjectId","PeopleType","PeopleSubtype","Phones","ConcatenatedId","UserPrincipalName","GivenName","Surname","Cid"],"Filter":{"And":[{"Or":[{"Term":{"PeopleType":"Person"}},{"Term":{"PeopleType":"Other"}}]},{"Or":[{"Term":{"PeopleSubtype":"OrganizationUser"}},{"Term":{"PeopleSubtype":"Guest"}}]}]},"Provenances":["Mailbox","Directory"],"From":0},{"Query":{"QueryString":"$query"},"EntityType":"File","Size":3},{"Query":{"QueryString":"$query"},"EntityType":"Chat","Size":5},{"Query":{"QueryString":"$query"},"EntityType":"Team","Size":3},{"Query":{"QueryString":"$query"},"EntityType":"Channel","Size":4,"Filter":{"Or":[{"Term":{"ChannelType":"Standard"}},{"Term":{"ChannelType":"Shared"}}]}},{"Query":{"QueryString":"$query"},"EntityType":"Text","Size":2}],"Scenario":{"Name":"powerbar"},"Cvid": "$cvid","AppName":"Microsoft Teams","LogicalId":"4c91875d-6cd8-47b5-b32e-586a9a6716a2"}';
+}
 
-  for (final code in nimCode.keys) {
+void main() async {
+  // Replace with your actual bearer token
+  final bearerToken = "Bearer <token>";
+
+  // Replace with your actual cvid token
+  final cvid = "<cvid token>";
+
+  // Replace with batch year you want to scrape
+  // Example: '23' for 2023
+  // Note: This is the year of entry
+  final angkatan = '23';
+
+  final headers = getHeaders(bearerToken);
+  final params = getQueryParams();
+  final nimCodeMap = getNimCodeMap();
+
+  for (final code in nimCodeMap.keys) {
     final size = 500;
     final query = '$code$angkatan';
 
     print("Fetching $query");
 
-    final data =
-        '{"EntityRequests":[{"Query":{"QueryString":"$query","DisplayQueryString":"$query"},"EntityType":"People","Size":$size,"Fields":["Id","MRI","DisplayName","EmailAddresses","CompanyName","JobTitle","ImAddress","ExternalDirectoryObjectId","PeopleType","PeopleSubtype","Phones","ConcatenatedId","UserPrincipalName","GivenName","Surname","Cid"],"Filter":{"And":[{"Or":[{"Term":{"PeopleType":"Person"}},{"Term":{"PeopleType":"Other"}}]},{"Or":[{"Term":{"PeopleSubtype":"OrganizationUser"}},{"Term":{"PeopleSubtype":"Guest"}}]}]},"Provenances":["Mailbox","Directory"],"From":0},{"Query":{"QueryString":"$query"},"EntityType":"File","Size":3},{"Query":{"QueryString":"$query"},"EntityType":"Chat","Size":5},{"Query":{"QueryString":"$query"},"EntityType":"Team","Size":3},{"Query":{"QueryString":"$query"},"EntityType":"Channel","Size":4,"Filter":{"Or":[{"Term":{"ChannelType":"Standard"}},{"Term":{"ChannelType":"Shared"}}]}},{"Query":{"QueryString":"$query"},"EntityType":"Text","Size":2}],"Scenario":{"Name":"powerbar"},"Cvid": "$cvid","AppName":"Microsoft Teams","LogicalId":"4c91875d-6cd8-47b5-b32e-586a9a6716a2"}';
+    final requestBody = getRequestBody(
+      query: query,
+      cvid: cvid,
+      size: size,
+    );
 
     final url =
         Uri.parse('https://substrate.office.com/search/api/v1/suggestions')
             .replace(queryParameters: params);
 
-    final res = await http.post(url, headers: headers, body: data);
+    final res = await http.post(url, headers: headers, body: requestBody);
     final status = res.statusCode;
     if (status != 200) throw Exception('http.post error: statusCode= $status');
 
-    // append to file
-    final file = await File('data/output_jurusan_21_new.txt').create();
-    await file.writeAsString("${res.body}$splitter",
-        mode: FileMode.writeOnlyAppend);
+    // Write the response to a file
+    final file = await File('data/batch_2023.txt').create();
+    await file.writeAsString("${res.body}\n", mode: FileMode.writeOnlyAppend);
 
     print("Done fetching $query - Length response: ${res.body.length}");
   }

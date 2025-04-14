@@ -17,7 +17,7 @@ What you will get:
 3. Update `cvid` with your own cvid
 4. Select which batch (angkatan) you want to scrape. Ex: '21' for 2021
 5. Run the script with `dart bin/teams_scrapper.dart`
-6. The script will create a file inside `data` folder. Ex: `data/output_jurusan_22_new.txt`
+6. The script will create a file inside `data` folder. Ex: `data/batch_2023.txt`
 
 ### Read txt, Output to .py and .json
 
